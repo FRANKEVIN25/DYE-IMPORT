@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
-import { ChevronRight, ArrowRight, ShieldCheck, ChevronLeft } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { ChevronRight, ArrowRight, ShieldCheck, ChevronLeft, Package } from 'lucide-react';
 
-// IMÁGENES HERO
+// IMÁGENES HERO - Optimizadas con parámetros de compresión
 const heroSlides = [
   {
     id: 'h1',
@@ -9,7 +9,7 @@ const heroSlides = [
     title: 'SOLUCIONES EN REPUESTOS',
     highlight: 'PREMIUM',
     description: 'Componentes de alta ingeniería para mantener la integridad de tu vehículo.',
-    image: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=2000&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=60&w=1920&auto=format&fit=crop',
   },
   {
     id: 'h2',
@@ -17,27 +17,27 @@ const heroSlides = [
     title: 'TECNOLOGÍA QUE MUEVE TU',
     highlight: 'MUNDO',
     description: 'Stock completo de piezas originales y alternativas de primer nivel.',
-    image: 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=2000&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=60&w=1920&auto=format&fit=crop',
   }
 ];
 
-// ESTADÍSTICAS
+// ESTADÍSTICAS - Imágenes más pequeñas
 const statsData = [
   { 
     label: 'Compromiso y experiencia que nos respaldan', 
-    image: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&h=400&fit=crop'
+    image: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=200&h=200&fit=crop&q=60'
   },
   { 
     label: 'Disponibilidad inmediata en repuestos', 
-    image: 'https://images.unsplash.com/photo-1553413077-190dd305871c?w=400&h=400&fit=crop'
+    image: 'https://images.unsplash.com/photo-1553413077-190dd305871c?w=200&h=200&fit=crop&q=60'
   },
   { 
     label: 'Alianzas con fabricantes reconocidos', 
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=400&fit=crop'
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=200&h=200&fit=crop&q=60'
   },
   { 
     label: 'Comprometidos con la satisfacción del cliente', 
-    image: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=400&h=400&fit=crop'
+    image: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=200&h=200&fit=crop&q=60'
   }
 ];
 
@@ -60,12 +60,68 @@ const highlightedProducts = [
   { id: 'hp5', name: "Batería Pro-Start", category: "Eléctrico", image: "/images/bateria.png" },
 ];
 
-const HomePage = ({ products = [], setView = () => {}, setSelectedProduct = () => {}, setSelectedCategory = () => {} }) => {
+// ============================================
+// COMPONENTE DE IMAGEN OPTIMIZADA
+// ============================================
+const OptimizedImage = ({ src, alt, className, priority = false }) => {
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+
+  return (
+    <div className="relative w-full h-full">
+      {!loaded && !error && (
+        <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+      )}
+      {!error ? (
+        <img
+          src={src}
+          alt={alt}
+          loading={priority ? 'eager' : 'lazy'}
+          onLoad={() => setLoaded(true)}
+          onError={() => setError(true)}
+          className={`${className} transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+          <Package className="text-gray-300" size={48} />
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================
+// SKELETON LOADER PARA PRODUCTOS DESTACADOS
+// ============================================
+const ProductSkeleton = () => (
+  <div className="min-w-[85%] md:min-w-[calc(50%-1rem)] lg:min-w-[calc(25%-1.5rem)] snap-start">
+    <div className="bg-white border border-gray-100 rounded-3xl p-4 animate-pulse">
+      <div className="aspect-square rounded-2xl bg-gray-200 mb-6"></div>
+      <div className="px-2 space-y-3">
+        <div className="h-5 bg-gray-200 rounded w-3/4"></div>
+        <div className="h-3 bg-gray-100 rounded w-1/2"></div>
+      </div>
+    </div>
+  </div>
+);
+
+const HomePage = ({ 
+  products = [], 
+  isLoadingData = false,
+  setView = () => {}, 
+  setSelectedProduct = () => {}, 
+  setSelectedCategory = () => {} 
+}) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const scrollRef = useRef(null);
   
-  const featuredItems = products.filter(p => p.featured === true);
+  // Memoizar productos destacados
+  const featuredItems = useMemo(() => 
+    products.filter(p => p.featured === true),
+    [products]
+  );
 
+  // Auto-slide del hero
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
@@ -86,7 +142,7 @@ const HomePage = ({ products = [], setView = () => {}, setSelectedProduct = () =
 
   return (
     <div className="bg-white">
-      {/* --- HERO SECTION --- */}
+      {/* --- HERO SECTION OPTIMIZADO --- */}
       <section className="relative h-[90vh] min-h-[600px] overflow-hidden bg-gray-900">
         {heroSlides.map((slide, index) => (
           <div
@@ -95,10 +151,16 @@ const HomePage = ({ products = [], setView = () => {}, setSelectedProduct = () =
               index === currentSlide ? 'opacity-100 scale-105' : 'opacity-0 scale-100'
             }`}
           >
-            <img src={slide.image} alt="" className="w-full h-full object-cover" />
+            <OptimizedImage 
+              src={slide.image} 
+              alt=""
+              priority={index === 0}
+              className="w-full h-full object-cover"
+            />
             <div className="absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-900/60 to-transparent" />
           </div>
         ))}
+        
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-7xl mx-auto px-6 w-full">
             <div className="max-w-3xl space-y-6">
@@ -129,6 +191,7 @@ const HomePage = ({ products = [], setView = () => {}, setSelectedProduct = () =
             </div>
           </div>
         </div>
+        
         <div className="absolute bottom-12 left-6 md:left-24 flex gap-4">
           {heroSlides.map((_, i) => (
             <button
@@ -155,41 +218,51 @@ const HomePage = ({ products = [], setView = () => {}, setSelectedProduct = () =
         </div>
       </section>
 
-      {/* --- PRODUCTOS DESTACADOS (CARRUSEL CON FLECHAS LATERALES) --- */}
-      {featuredItems.length > 0 && (
-        <section className="py-24 max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-            <div className="space-y-2">
-              <h2 className="text-sm font-black text-blue-600 tracking-[0.3em] uppercase">Selección Exclusiva</h2>
-              <h3 className="text-5xl font-black text-gray-900">PRODUCTOS <span className="text-gray-400">DESTACADOS</span></h3>
-            </div>
-            <button onClick={() => setView('catalog')} className="flex items-center gap-2 font-bold text-gray-900 hover:text-blue-600 transition-colors group">
-              VER TODA LA TIENDA <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-            </button>
+      {/* --- PRODUCTOS DESTACADOS OPTIMIZADO CON SKELETON --- */}
+      <section className="py-24 max-w-7xl mx-auto px-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div className="space-y-2">
+            <h2 className="text-sm font-black text-blue-600 tracking-[0.3em] uppercase">Selección Exclusiva</h2>
+            <h3 className="text-5xl font-black text-gray-900">PRODUCTOS <span className="text-gray-400">DESTACADOS</span></h3>
           </div>
+          <button onClick={() => setView('catalog')} className="flex items-center gap-2 font-bold text-gray-900 hover:text-blue-600 transition-colors group">
+            VER TODA LA TIENDA <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
 
-          <div className="relative group/carousel">
-            {/* Flecha Izquierda */}
+        <div className="relative group/carousel">
+          {/* Flecha Izquierda */}
+          {featuredItems.length > 3 && (
             <button 
               onClick={() => scrollFeatured('left')}
               className="absolute -left-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white shadow-xl rounded-full text-gray-900 opacity-0 group-hover/carousel:opacity-100 -translate-x-4 group-hover/carousel:translate-x-0 transition-all hover:bg-blue-600 hover:text-white border border-gray-100"
             >
               <ChevronLeft size={28} />
             </button>
+          )}
 
-            {/* Contenedor de productos */}
-            <div 
-              ref={scrollRef}
-              className="flex gap-8 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-8 px-2"
-            >
-              {featuredItems.map(p => (
+          {/* Contenedor de productos */}
+          <div 
+            ref={scrollRef}
+            className="flex gap-8 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-8 px-2"
+          >
+            {isLoadingData ? (
+              // Mostrar skeletons mientras carga
+              [...Array(4)].map((_, i) => <ProductSkeleton key={i} />)
+            ) : featuredItems.length > 0 ? (
+              // Mostrar productos reales
+              featuredItems.map(p => (
                 <div 
                   key={p.id}
                   onClick={() => { setSelectedProduct(p); setView('product'); }}
                   className="min-w-[85%] md:min-w-[calc(50%-1rem)] lg:min-w-[calc(25%-1.5rem)] snap-start group relative bg-white border border-gray-100 rounded-3xl p-4 transition-all hover:shadow-2xl hover:border-blue-100 cursor-pointer"
                 >
                   <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-50 mb-6">
-                    <img src={p.image} alt={p.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <OptimizedImage 
+                      src={p.image} 
+                      alt={p.name}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-black tracking-tighter text-blue-600 shadow-sm">
                       TOP VENTAS
                     </div>
@@ -199,19 +272,27 @@ const HomePage = ({ products = [], setView = () => {}, setSelectedProduct = () =
                     <p className="text-gray-400 text-sm font-medium uppercase tracking-tighter">Original Equipment</p>
                   </div>
                 </div>
-              ))}
-            </div>
+              ))
+            ) : (
+              // Sin productos destacados
+              <div className="w-full text-center py-12 text-gray-400">
+                <Package size={48} className="mx-auto mb-4 text-gray-200" />
+                <p className="font-bold">No hay productos destacados aún</p>
+              </div>
+            )}
+          </div>
 
-            {/* Flecha Derecha */}
+          {/* Flecha Derecha */}
+          {featuredItems.length > 3 && (
             <button 
               onClick={() => scrollFeatured('right')}
               className="absolute -right-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white shadow-xl rounded-full text-gray-900 opacity-0 group-hover/carousel:opacity-100 translate-x-4 group-hover/carousel:translate-x-0 transition-all hover:bg-blue-600 hover:text-white border border-gray-100"
             >
               <ChevronRight size={28} />
             </button>
-          </div>
-        </section>
-      )}
+          )}
+        </div>
+      </section>
 
       {/* --- CATEGORÍAS --- */}
       <section className="py-24 bg-gray-50">
@@ -224,12 +305,13 @@ const HomePage = ({ products = [], setView = () => {}, setSelectedProduct = () =
             {categoriesData.map(cat => (
               <button
                 key={cat.id}
-                onClick={() => { setSelectedCategory(cat.id); setView('catalog'); }}
+                onClick={() => { setSelectedCategory(cat.name); setView('catalog'); }}
                 className="group relative bg-white rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-2xl transition-all duration-500 text-center overflow-hidden h-64"
               >
-                <div 
-                  className="absolute inset-0 bg-cover bg-center transform group-hover:scale-110 transition-transform duration-700"
-                  style={{ backgroundImage: `url(${cat.image})` }}
+                <OptimizedImage
+                  src={cat.image}
+                  alt={cat.name}
+                  className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent group-hover:from-blue-900 group-hover:via-blue-900/60 transition-all duration-500" />
                 <div className="relative h-full flex flex-col justify-end p-6">
@@ -244,7 +326,7 @@ const HomePage = ({ products = [], setView = () => {}, setSelectedProduct = () =
         </div>
       </section>
 
-      {/* --- CARRUSEL VISUAL DE PRODUCTOS (DESLIZAMIENTO AUTOMÁTICO) --- */}
+      {/* --- CARRUSEL VISUAL DE PRODUCTOS --- */}
       <section className="py-24 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 mb-12">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -265,10 +347,10 @@ const HomePage = ({ products = [], setView = () => {}, setSelectedProduct = () =
             {[...highlightedProducts, ...highlightedProducts].map((item, index) => (
               <div key={`${item.id}-${index}`} className="w-[300px] md:w-[420px] flex-shrink-0">
                 <div className="group/card relative h-[500px] bg-gray-900 rounded-[2.5rem] overflow-hidden shadow-2xl">
-                  <img 
-                    src={item.image} 
-                    className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover/card:scale-110 group-hover/card:opacity-40 transition-all duration-700" 
-                    alt={item.name} 
+                  <OptimizedImage
+                    src={item.image}
+                    alt={item.name}
+                    className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover/card:scale-110 group-hover/card:opacity-40 transition-all duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/20 to-transparent" />
                   <div className="absolute inset-0 p-10 flex flex-col justify-end">

@@ -19,7 +19,9 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminPassword, setAdminPassword] = useState('');
-  const [loading, setLoading] = useState(true);
+  
+  // ✅ CAMBIO CLAVE: Ya NO bloqueamos la UI con loading
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
   // Estados para datos de Supabase
   const [products, setProducts] = useState([]);
@@ -37,11 +39,10 @@ function App() {
     // Si ya tenemos datos en caché y no ha pasado el tiempo, no recargar
     if (!forceRefresh && lastFetch && (now - lastFetch) < CACHE_DURATION && products.length > 0) {
       console.log('✅ Usando datos en caché');
-      setLoading(false);
       return;
     }
 
-    setLoading(true);
+    setIsLoadingData(true);
     try {
       console.log('🔄 Cargando datos desde Supabase...');
       
@@ -69,7 +70,7 @@ function App() {
     } catch (error) {
       console.error('❌ Error al cargar datos:', error);
     } finally {
-      setLoading(false);
+      setIsLoadingData(false);
     }
   }, [lastFetch, products.length]);
 
@@ -139,25 +140,8 @@ function App() {
   const memoizedVehicles = useMemo(() => vehicles, [vehicles]);
 
   // ============================================
-  // PANTALLA DE CARGA INICIAL
+  // ✅ AHORA LA UI SE MUESTRA INMEDIATAMENTE
   // ============================================
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50">
-        <div className="text-center space-y-6">
-          <div className="relative w-20 h-20 mx-auto">
-            <div className="absolute inset-0 border-8 border-blue-200 rounded-full"></div>
-            <div className="absolute inset-0 border-8 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-2xl font-black text-gray-900">Cargando catálogo...</h2>
-            <p className="text-gray-600">Esto solo toma un momento</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-white">
       {!isAdmin && <Header currentView={view} setView={setView} />}
@@ -168,6 +152,7 @@ function App() {
             products={memoizedProducts}
             categories={memoizedCategories}
             vehicles={memoizedVehicles}
+            isLoadingData={isLoadingData}
             setView={setView}
             setSelectedProduct={setSelectedProduct}
             setSelectedCategory={setSelectedCategory}
@@ -179,6 +164,7 @@ function App() {
             products={memoizedProducts}
             categories={memoizedCategories}
             vehicles={memoizedVehicles}
+            isLoadingData={isLoadingData}
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
             searchQuery={searchQuery}

@@ -1,23 +1,52 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Search, SlidersHorizontal, X, Car, Package } from 'lucide-react';
-import { supabase } from '../services/supabase';
 
 // ============================================
-// COMPONENTE TARJETA DE PRODUCTO
+// SKELETON LOADER PARA PRODUCTOS
+// ============================================
+const ProductSkeleton = () => (
+  <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 animate-pulse">
+    <div className="h-56 bg-gray-200"></div>
+    <div className="p-5 space-y-3">
+      <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+      <div className="h-5 bg-gray-300 rounded w-3/4"></div>
+      <div className="h-3 bg-gray-200 rounded w-full"></div>
+      <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+      <div className="h-10 bg-gray-200 rounded mt-4"></div>
+    </div>
+  </div>
+);
+
+// ============================================
+// COMPONENTE TARJETA DE PRODUCTO OPTIMIZADA
 // ============================================
 const ProductCard = ({ product, onClick }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
   return (
     <div 
       onClick={() => onClick(product)}
       className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer overflow-hidden border border-gray-100 flex flex-col h-full"
     >
       <div className="relative h-56 overflow-hidden bg-gray-50">
-        {product.image ? (
-          <img 
-            src={product.image} 
-            alt={product.name} 
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-          />
+        {product.image && !imageError ? (
+          <>
+            {/* Skeleton mientras carga la imagen */}
+            {!imageLoaded && (
+              <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>
+            )}
+            <img 
+              src={product.image} 
+              alt={product.name}
+              loading="lazy" // ✅ Lazy loading nativo
+              onLoad={() => setImageLoaded(true)}
+              onError={() => setImageError(true)}
+              className={`w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+          </>
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-300">
             <Package size={64} />
@@ -72,67 +101,41 @@ const ProductCard = ({ product, onClick }) => {
 };
 
 // ============================================
-// COMPONENTE PRINCIPAL - CATÁLOGO
+// COMPONENTE PRINCIPAL - CATÁLOGO OPTIMIZADO
 // ============================================
 const CatalogPage = ({ 
+  products = [],
+  categories = [],
+  vehicles = [],
+  isLoadingData = false,
+  selectedCategory: propSelectedCategory = '',
+  setSelectedCategory: propSetSelectedCategory = () => {},
+  searchQuery: propSearchQuery = '',
+  setSearchQuery: propSetSearchQuery = () => {},
   setSelectedProduct = () => {},
   setView = () => {}
 }) => {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [vehicles, setVehicles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  // Estados locales para filtros - Normalizamos 'all' a cadena vacía
+  const [searchQuery, setSearchQueryLocal] = useState(propSearchQuery);
+  const [selectedCategory, setSelectedCategoryLocal] = useState(
+    propSelectedCategory === 'all' ? '' : (propSelectedCategory || '')
+  );
   const [selectedVehicleBrand, setSelectedVehicleBrand] = useState('');
   const [selectedVehicleModel, setSelectedVehicleModel] = useState('');
   const [sortBy, setSortBy] = useState('featured');
   const [showFilters, setShowFilters] = useState(false);
 
-  // ============================================
-  // CARGAR DATOS DESDE SUPABASE
-  // ============================================
+  // Sincronizar con props si vienen del HomePage
   useEffect(() => {
-    loadAllData();
-  }, []);
+    if (propSearchQuery) setSearchQueryLocal(propSearchQuery);
+  }, [propSearchQuery]);
 
-  const loadAllData = async () => {
-    setLoading(true);
-    try {
-      // Cargar productos
-      const { data: productsData, error: productsError } = await supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (productsError) throw productsError;
-
-      // Cargar categorías
-      const { data: categoriesData, error: categoriesError } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name');
-      
-      if (categoriesError) throw categoriesError;
-
-      // Cargar vehículos
-      const { data: vehiclesData, error: vehiclesError } = await supabase
-        .from('vehicles')
-        .select('*')
-        .order('brand');
-      
-      if (vehiclesError) throw vehiclesError;
-
-      setProducts(productsData || []);
-      setCategories(categoriesData || []);
-      setVehicles(vehiclesData || []);
-    } catch (error) {
-      console.error('Error al cargar datos:', error);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (propSelectedCategory) {
+      // Normalizar 'all' a cadena vacía
+      setSelectedCategoryLocal(propSelectedCategory === 'all' ? '' : propSelectedCategory);
     }
-  };
+  }, [propSelectedCategory]);
 
   // Resetear modelo cuando cambia la marca
   useEffect(() => {
@@ -144,64 +147,69 @@ const CatalogPage = ({
   const availableModels = selectedVehicle?.models || [];
 
   // ============================================
-  // FILTRAR Y ORDENAR PRODUCTOS
+  // FILTRAR Y ORDENAR PRODUCTOS (MEMOIZADO)
   // ============================================
-  const filteredProducts = products.filter(product => {
-    const searchLower = searchQuery.toLowerCase();
-    const matchesSearch = !searchQuery || 
-      product.name.toLowerCase().includes(searchLower) ||
-      product.description?.toLowerCase().includes(searchLower);
-    
-    const matchesCategory = !selectedCategory || product.category === selectedCategory;
-    const matchesVehicleBrand = !selectedVehicleBrand || product.vehicle_brand === selectedVehicleBrand;
-    const matchesVehicleModel = !selectedVehicleModel || 
-      (product.compatible_models && product.compatible_models.includes(selectedVehicleModel));
-    
-    return matchesSearch && matchesCategory && matchesVehicleBrand && matchesVehicleModel;
-  });
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+      const searchLower = searchQuery.toLowerCase();
+      const matchesSearch = !searchQuery || 
+        product.name.toLowerCase().includes(searchLower) ||
+        product.description?.toLowerCase().includes(searchLower);
+      
+      // Si selectedCategory está vacío (''), mostrar TODOS los productos
+      const matchesCategory = selectedCategory === '' || product.category === selectedCategory;
+      const matchesVehicleBrand = !selectedVehicleBrand || product.vehicle_brand === selectedVehicleBrand;
+      const matchesVehicleModel = !selectedVehicleModel || 
+        (product.compatible_models && product.compatible_models.includes(selectedVehicleModel));
+      
+      return matchesSearch && matchesCategory && matchesVehicleBrand && matchesVehicleModel;
+    });
+  }, [products, searchQuery, selectedCategory, selectedVehicleBrand, selectedVehicleModel]);
 
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    switch(sortBy) {
-      case 'featured':
-        if (a.featured && !b.featured) return -1;
-        if (!a.featured && b.featured) return 1;
-        return 0;
-      case 'name':
-        return a.name.localeCompare(b.name);
-      default: 
-        return 0;
-    }
-  });
+  const sortedProducts = useMemo(() => {
+    return [...filteredProducts].sort((a, b) => {
+      switch(sortBy) {
+        case 'featured':
+          if (a.featured && !b.featured) return -1;
+          if (!a.featured && b.featured) return 1;
+          return 0;
+        case 'name':
+          return a.name.localeCompare(b.name);
+        default: 
+          return 0;
+      }
+    });
+  }, [filteredProducts, sortBy]);
 
   const clearAllFilters = () => {
-    setSearchQuery('');
-    setSelectedCategory('');
+    setSearchQueryLocal('');
+    setSelectedCategoryLocal('');
     setSelectedVehicleBrand('');
     setSelectedVehicleModel('');
     setSortBy('featured');
+    propSetSearchQuery('');
+    propSetSelectedCategory('');
   };
 
   const activeFiltersCount = 
-    (selectedCategory ? 1 : 0) + 
+    (selectedCategory !== '' ? 1 : 0) + 
     (selectedVehicleBrand ? 1 : 0) + 
     (selectedVehicleModel ? 1 : 0);
 
   // ============================================
-  // PANTALLA DE CARGA
+  // DEBUG TEMPORAL - ELIMINAR DESPUÉS
   // ============================================
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 pt-20 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mb-4"></div>
-          <p className="text-xl font-bold text-gray-600">Cargando catálogo...</p>
-        </div>
-      </div>
-    );
-  }
+  console.log('🔍 DEBUG CatalogPage:', {
+    totalProducts: products.length,
+    selectedCategory,
+    filteredCount: filteredProducts.length,
+    sortedCount: sortedProducts.length,
+    isLoadingData,
+    categories: categories.length
+  });
 
   // ============================================
-  // RENDER PRINCIPAL
+  // RENDER PRINCIPAL (SIN LOADING BLOQUEANTE)
   // ============================================
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
@@ -221,7 +229,10 @@ const CatalogPage = ({
               type="text"
               placeholder="Buscar por nombre o descripción..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQueryLocal(e.target.value);
+                propSetSearchQuery(e.target.value);
+              }}
               className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none"
             />
           </div>
@@ -312,8 +323,11 @@ const CatalogPage = ({
                     <input 
                       type="radio" 
                       name="category" 
-                      checked={!selectedCategory} 
-                      onChange={() => setSelectedCategory('')} 
+                      checked={selectedCategory === ''} 
+                      onChange={() => {
+                        setSelectedCategoryLocal('');
+                        propSetSelectedCategory('');
+                      }}
                       className="w-4 h-4 text-blue-600" 
                     />
                     <span className="ml-3 text-gray-700 font-bold text-sm">Todas</span>
@@ -325,7 +339,10 @@ const CatalogPage = ({
                         type="radio" 
                         name="category" 
                         checked={selectedCategory === category.name} 
-                        onChange={() => setSelectedCategory(category.name)} 
+                        onChange={() => {
+                          setSelectedCategoryLocal(category.name);
+                          propSetSelectedCategory(category.name);
+                        }}
                         className="w-4 h-4 text-blue-600" 
                       />
                       <span className="ml-3 text-gray-700 font-bold text-sm">{category.name}</span>
@@ -347,11 +364,18 @@ const CatalogPage = ({
           <main className="flex-1">
             <div className="mb-6">
               <p className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">
-                {sortedProducts.length} Repuestos encontrados
+                {isLoadingData ? 'Cargando...' : `${sortedProducts.length} Repuestos encontrados`}
               </p>
             </div>
 
-            {products.length === 0 ? (
+            {/* SKELETON LOADERS mientras carga */}
+            {isLoadingData ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <ProductSkeleton key={i} />
+                ))}
+              </div>
+            ) : products.length === 0 ? (
               <div className="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-200">
                 <Package size={48} className="text-gray-200 mx-auto mb-4" />
                 <h3 className="text-xl font-black text-gray-400">Inventario vacío</h3>

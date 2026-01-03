@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 const Header = ({ currentView = 'home', setView = () => {} }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [logoLoaded, setLogoLoaded] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -25,23 +26,31 @@ const Header = ({ currentView = 'home', setView = () => {} }) => {
           : 'bg-white border-b border-gray-100 h-20 md:h-24'
       }`}
     >
-      {/* Reducimos el padding lateral del contenedor (px-2 md:px-4) para ganar espacio */}
       <div className="max-w-7xl mx-auto h-full px-2 md:px-4">
         <div className="flex items-center justify-between h-full relative">
           
-          {/* LADO IZQUIERDO: LOGO IDENTIDAD (Ahora más a la izquierda) */}
+          {/* LADO IZQUIERDO: LOGO IDENTIDAD */}
           <div 
-            className="flex items-center cursor-pointer group -ml-2 md:-ml-6" // Margen negativo para pegarlo al borde
+            className="flex items-center cursor-pointer group -ml-2 md:-ml-6"
             onClick={() => setView('home')}
           >
-            {/* Contenedor del Logo */}
+            {/* Contenedor del Logo con lazy loading */}
             <div className="relative w-24 md:w-32 h-10">
+              {!logoLoaded && (
+                <div className={`absolute left-0 bg-gray-100 rounded animate-pulse
+                  ${scrolled ? 'h-20 md:h-24 -top-6' : 'h-28 md:h-32 -top-10'}
+                `}></div>
+              )}
               <img 
                 src="/images/logo.png" 
-                alt="DYE IMPORT" 
+                alt="DYE IMPORT"
+                loading="eager"
+                onLoad={() => setLogoLoaded(true)}
                 className={`absolute left-0 transition-all duration-500 object-contain drop-shadow-md
                   ${scrolled ? 'h-20 md:h-24 -top-6' : 'h-28 md:h-32 -top-10'}
-                  group-hover:scale-105`}
+                  group-hover:scale-105
+                  ${logoLoaded ? 'opacity-100' : 'opacity-0'}
+                `}
               />
             </div>
 
@@ -77,10 +86,11 @@ const Header = ({ currentView = 'home', setView = () => {} }) => {
             ))}
           </nav>
 
-          {/* MENÚ MÓVIL */}
+          {/* MENÚ MÓVIL HAMBURGUESA */}
           <button 
             className="md:hidden p-2 text-slate-800"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Menú"
           >
             <div className="w-6 h-5 flex flex-col justify-between">
               <span className={`h-0.5 w-full bg-current transition-all ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
@@ -113,4 +123,4 @@ const Header = ({ currentView = 'home', setView = () => {} }) => {
   );
 };
 
-export default Header; 
+export default Header;
