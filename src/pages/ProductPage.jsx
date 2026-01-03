@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { ArrowLeft, Star, Package, Phone, Mail, Car } from 'lucide-react';
 import { companyInfo } from '../data/initialData';
 
@@ -10,6 +11,11 @@ const ProductPage = ({
   setSelectedProduct 
 }) => {
   
+  // ✅ SOLUCIÓN: Hacer scroll instantáneo al inicio cuando cambie el producto
+  useEffect(() => {
+    window.scrollTo(0, 0); // Scroll instantáneo sin animación
+  }, [product?.id]); // Se ejecuta cada vez que cambia el producto
+
   // Validar que tenemos el producto
   if (!product) {
     return (
@@ -163,8 +169,8 @@ const ProductPage = ({
                   key={p.id}
                   product={p}
                   onClick={(prod) => {
+                    // ✅ SOLUCIÓN: Solo cambiar el producto, el scroll lo maneja useEffect
                     setSelectedProduct(prod);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
                 />
               ))}

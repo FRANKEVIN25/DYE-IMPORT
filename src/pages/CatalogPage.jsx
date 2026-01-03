@@ -26,7 +26,7 @@ const ProductCard = ({ product, onClick }) => {
         
         {product.featured && (
           <span className="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-            ⭐ Destacado
+            Destacado
           </span>
         )}
         
@@ -241,8 +241,8 @@ const CatalogPage = ({
             onChange={(e) => setSortBy(e.target.value)}
             className="px-4 py-3 border-2 border-gray-200 rounded-xl outline-none font-bold bg-white"
           >
-            <option value="featured">⭐ Destacados</option>
-            <option value="name">🔤 Nombre A-Z</option>
+            <option value="featured">Destacados</option>
+            <option value="name">Nombre A-Z</option>
           </select>
         </div>
 

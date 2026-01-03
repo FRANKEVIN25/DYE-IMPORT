@@ -45,8 +45,8 @@ const AboutPage = () => {
                 className="rounded-3xl shadow-2xl"
               />
               <div className="absolute -bottom-6 -left-6 bg-blue-600 text-white p-8 rounded-2xl shadow-xl">
-                <div className="text-5xl font-black mb-2">10+</div>
-                <div className="text-lg font-semibold">Años de Experiencia</div>
+                <div className="text-5xl font-black mb-2">100%</div>
+                <div className="text-lg font-semibold">Compromiso con la calidad</div>
               </div>
             </div>
           </div>

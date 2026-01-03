@@ -9,7 +9,7 @@ const Footer = () => (
           <h3 className="text-2xl font-bold mb-4">{companyInfo.name}</h3>
           <p className="text-gray-400 mb-4">{companyInfo.slogan}</p>
           <p className="text-sm text-gray-400">
-            Más de 10 años brindando calidad y confianza en autopartes
+            Calidad y confianza en autopartes para tu vehículo
           </p>
         </div>
         

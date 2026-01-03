@@ -7,9 +7,9 @@ export const companyInfo = {
   address: 'Jr. Cuarzos 1880, Lima, Perú',
   whatsapp: '51974640915',
   about: {
-    description: 'Somos una empresa peruana con más de 10 años de experiencia en la comercialización de autopartes de alta calidad. Nos especializamos en ofrecer repuestos originales y alternativos para todo tipo de vehículos.',
-    mission: 'Proveer autopartes de la más alta calidad al mejor precio del mercado, garantizando la satisfacción total de nuestros clientes.',
-    vision: 'Ser la empresa líder en distribución de autopartes en Perú, reconocida por nuestra calidad, servicio y compromiso.',
+    description: 'Somos una empresa peruana en crecimiento dedicada a la comercialización de autopartes de calidad, enfocada en brindar soluciones confiables para el mantenimiento y cuidado de todo tipo de vehículos.',
+    mission: 'Ofrecer autopartes confiables y accesibles, brindando una atención cercana y eficiente que genere confianza y satisfacción en cada cliente.',
+    vision: 'Consolidarnos como una empresa referente en el sector de autopartes en Perú, destacando por nuestra responsabilidad, calidad de productos y excelente servicio al cliente.',
     values: [
       { title: 'Calidad', description: 'Productos certificados y garantizados' },
       { title: 'Honestidad', description: 'Precios justos y transparentes' },
