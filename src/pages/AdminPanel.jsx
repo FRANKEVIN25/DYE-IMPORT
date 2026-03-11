@@ -219,12 +219,13 @@ const VehiclesPanel = ({ data, loadAllData }) => {
 };
 
 // ============================================
-// PANEL DE PRODUCTOS
+// PANEL DE PRODUCTOS — con buscador funcional
 // ============================================
 const ProductsPanel = ({ data, loadAllData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const fileInputRef = useRef(null);
   
   const [formData, setFormData] = useState({
@@ -233,6 +234,18 @@ const ProductsPanel = ({ data, loadAllData }) => {
   });
 
   const selectedVehicle = data.vehicles.find(v => v.brand === formData.vehicle_brand);
+
+  // ── Filtro real conectado a searchQuery ──
+  const filteredProducts = data.products.filter(p => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return true;
+    return (
+      p.name?.toLowerCase().includes(q) ||
+      p.category?.toLowerCase().includes(q) ||
+      p.vehicle_brand?.toLowerCase().includes(q) ||
+      p.compatible_models?.some(m => m.toLowerCase().includes(q))
+    );
+  });
 
   const handleSave = async () => {
     if (!formData.name || !formData.category || !formData.vehicle_brand) return alert("Faltan campos");
@@ -257,67 +270,106 @@ const ProductsPanel = ({ data, loadAllData }) => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold text-slate-900">Inventario</h2>
-          <p className="text-slate-500 text-sm">Gestiona {data.products.length} repuestos registrados</p>
+          {/* Contador dinámico: muestra cuántos resultados hay */}
+          <p className="text-slate-500 text-sm">
+            {searchQuery
+              ? `${filteredProducts.length} resultado${filteredProducts.length !== 1 ? 's' : ''} para "${searchQuery}"`
+              : `Gestiona ${data.products.length} repuestos registrados`
+            }
+          </p>
         </div>
         <div className="flex gap-3">
-            <div className="relative group">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500" size={18}/>
-                <input type="text" placeholder="Buscar..." className="pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 ring-indigo-500/10 focus:border-indigo-500 transition-all w-64"/>
-            </div>
-            <button 
-                onClick={() => { setEditing(null); setFormData({name: '', category: '', vehicle_brand: '', compatible_models: [], image: '', description: '', in_stock: true, featured: false}); setIsModalOpen(true); }} 
-                className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold flex items-center gap-2 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200"
-            >
-                <Plus size={18} /> Nuevo Producto
-            </button>
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={18}/>
+            <input
+              type="text"
+              placeholder="Buscar por nombre, categoría, marca..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="pl-10 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 ring-indigo-500/10 focus:border-indigo-500 transition-all w-72 text-sm"
+            />
+            {/* Botón limpiar búsqueda */}
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500 transition-colors"
+              >
+                <X size={15} />
+              </button>
+            )}
+          </div>
+          <button 
+            onClick={() => { setEditing(null); setFormData({name: '', category: '', vehicle_brand: '', compatible_models: [], image: '', description: '', in_stock: true, featured: false}); setIsModalOpen(true); }} 
+            className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold flex items-center gap-2 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 whitespace-nowrap"
+          >
+            <Plus size={18} /> Nuevo Producto
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
-        {data.products.map(product => (
-          <div key={product.id} className="group bg-white rounded-[2rem] border border-slate-200 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300">
-            <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden">
-              {product.image ? (
-                <img src={product.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt={product.name} />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-slate-300"><Package size={48} /></div>
-              )}
-              <div className="absolute top-4 left-4 flex gap-2">
-                {product.featured && <span className="bg-amber-400 text-amber-950 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter shadow-sm italic">Destacado</span>}
-                <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter shadow-sm ${product.in_stock ? 'bg-emerald-400 text-emerald-950' : 'bg-rose-400 text-rose-950'}`}>
+      {/* Grid — usa filteredProducts en lugar de data.products */}
+      {filteredProducts.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mb-4">
+            <Search size={28} className="text-slate-300" />
+          </div>
+          <p className="font-bold text-slate-500 mb-1">Sin resultados</p>
+          <p className="text-sm text-slate-400">
+            No hay productos que coincidan con <span className="font-semibold">"{searchQuery}"</span>
+          </p>
+          <button
+            onClick={() => setSearchQuery('')}
+            className="mt-4 text-indigo-600 text-sm font-bold hover:underline"
+          >
+            Limpiar búsqueda
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+          {filteredProducts.map(product => (
+            <div key={product.id} className="group bg-white rounded-[2rem] border border-slate-200 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300">
+              <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden">
+                {product.image ? (
+                  <img src={product.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt={product.name} />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-slate-300"><Package size={48} /></div>
+                )}
+                <div className="absolute top-4 left-4 flex gap-2">
+                  {product.featured && <span className="bg-amber-400 text-amber-950 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter shadow-sm italic">Destacado</span>}
+                  <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter shadow-sm ${product.in_stock ? 'bg-emerald-400 text-emerald-950' : 'bg-rose-400 text-rose-950'}`}>
                     {product.in_stock ? 'En Stock' : 'Sin Stock'}
-                </span>
-              </div>
-            </div>
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                    <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">{product.category}</p>
-                    <h3 className="font-bold text-slate-800 leading-tight line-clamp-1">{product.name}</h3>
+                  </span>
                 </div>
               </div>
-              <p className="text-xs text-slate-400 font-medium mb-4 flex items-center gap-1">
-                <Car size={12}/> {product.vehicle_brand} {product.compatible_models?.slice(0,2).join(', ')}
-              </p>
-              
-              <div className="flex gap-2 pt-4 border-t border-slate-50">
-                <button 
-                  onClick={() => { setEditing(product); setFormData(product); setIsModalOpen(true); }} 
-                  className="flex-1 bg-slate-900 text-white py-2.5 rounded-xl font-bold text-xs hover:bg-slate-800 transition-all"
-                >
-                  Editar
-                </button>
-                <button 
-                  onClick={async () => { if(confirm('¿Borrar?')) { await supabase.from('products').delete().eq('id', product.id); loadAllData(); } }} 
-                  className="p-2.5 bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-100 transition-all"
-                >
-                  <Trash2 size={18}/>
-                </button>
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">{product.category}</p>
+                    <h3 className="font-bold text-slate-800 leading-tight line-clamp-1">{product.name}</h3>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-400 font-medium mb-4 flex items-center gap-1">
+                  <Car size={12}/> {product.vehicle_brand} {product.compatible_models?.slice(0,2).join(', ')}
+                </p>
+                <div className="flex gap-2 pt-4 border-t border-slate-50">
+                  <button 
+                    onClick={() => { setEditing(product); setFormData(product); setIsModalOpen(true); }} 
+                    className="flex-1 bg-slate-900 text-white py-2.5 rounded-xl font-bold text-xs hover:bg-slate-800 transition-all"
+                  >
+                    Editar
+                  </button>
+                  <button 
+                    onClick={async () => { if(confirm('¿Borrar?')) { await supabase.from('products').delete().eq('id', product.id); loadAllData(); } }} 
+                    className="p-2.5 bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-100 transition-all"
+                  >
+                    <Trash2 size={18}/>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editing ? "Editar Producto" : "Nuevo Producto"}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
