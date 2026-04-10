@@ -143,7 +143,7 @@ function App() {
   // ✅ AHORA LA UI SE MUESTRA INMEDIATAMENTE
   // ============================================
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       {!isAdmin && <Header currentView={view} setView={setView} />}
       
       <main>
@@ -207,7 +207,7 @@ function App() {
         )}
       </main>
 
-      {!isAdmin && <Footer />}
+      {!isAdmin && <Footer setView={setView} />}
       
       {/* Botón flotante de WhatsApp */}
       {!isAdmin && (

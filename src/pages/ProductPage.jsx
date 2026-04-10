@@ -33,13 +33,13 @@ const ProductPage = ({
 
   // Garantías / features fijos
   const guarantees = [
-    { icon: ShieldCheck, label: 'Garantía de fábrica',   sub: 'Producto certificado'         },
+    { icon: ShieldCheck, label: 'Garantía incluida',      sub: 'Respaldo en cada compra'      },
     { icon: Truck,       label: 'Envío a todo el Perú',  sub: 'Despacho en 24 h en Lima'     },
     { icon: RotateCcw,   label: 'Soporte postventa',     sub: 'Asistencia técnica incluida'  },
   ];
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="min-h-screen bg-slate-300">
 
       {/* ── BREADCRUMB ── */}
       <div className="border-b border-gray-100 bg-gray-50">
@@ -80,7 +80,7 @@ const ProductPage = ({
               {/* Badges */}
               <div className="absolute top-5 left-5 flex flex-col gap-2">
                 {product.featured && (
-                  <span className="flex items-center gap-1.5 bg-yellow-400 text-yellow-900 px-3 py-1.5 rounded-full text-xs font-black shadow-lg">
+                  <span className="flex items-center gap-1.5 bg-blue-600 text-white px-3 py-1.5 rounded-full text-xs font-black shadow-lg">
                     <Star size={12} fill="currentColor" /> DESTACADO
                   </span>
                 )}
@@ -121,7 +121,7 @@ const ProductPage = ({
             {/* Marca + categoría */}
             <div className="flex flex-wrap items-center gap-2">
               <span className="bg-blue-600 text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest">
-                {product.vehicle_brand || 'Repuesto Original'}
+                {product.vehicle_brand || 'Autoparte'}
               </span>
               <span className="bg-gray-100 text-gray-600 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest">
                 {product.category || 'Autopartes'}
@@ -157,9 +157,9 @@ const ProductPage = ({
                   { label: 'Tipo',       value: product.category || '—'              },
                   { label: 'Marca',      value: product.vehicle_brand || '—'         },
                   { label: 'Condición',  value: 'Nuevo'                              },
-                  { label: 'Calidad',    value: 'Equipamiento Original'              },
+                  { label: 'Calidad',    value: 'Alta calidad'                       },
                   { label: 'Stock',      value: product.in_stock !== false ? 'Disponible' : 'Bajo Pedido' },
-                  { label: 'Garantía',   value: 'Sí, de fábrica'                    },
+                  { label: 'Garantía',   value: 'Sí, incluida'                      },
                 ].map((item, i) => (
                   <div key={i} className="flex flex-col bg-gray-50 rounded-xl px-4 py-3">
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-0.5">{item.label}</span>

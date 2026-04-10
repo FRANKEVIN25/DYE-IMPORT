@@ -6,28 +6,31 @@ const heroSlides = [
   {
     id: 'h1',
     subtitle: 'EXPERTISE AUTOMOTRIZ',
-    title: 'SOLUCIONES EN',
-    title2: 'REPUESTOS',
-    highlight: 'PREMIUM',
+    title: 'REPUESTOS',
+    title2: 'GEELY EN',
+    highlight: 'LIMA',
     description: 'Componentes de alta ingeniería para mantener la integridad de tu vehículo.',
     image: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=60&w=1920&auto=format&fit=crop',
-    tag: '+ 500 productos'
+    tag: 'Parque Unión Panamericana 429, La Victoria, Lima',
+    centered: true,
   },
   {
     id: 'h2',
-    subtitle: 'RENDIMIENTO ASEGURADO',
-    title: 'TECNOLOGÍA QUE',
-    title2: 'MUEVE TU',
-    highlight: 'MUNDO',
-    description: 'Stock completo de piezas originales y alternativas de primer nivel.',
-    image: 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=60&w=1920&auto=format&fit=crop',
-    tag: 'Envíos a todo Perú'
+    subtitle: 'REPUESTOS PARA TU GEELY',
+    title: 'TECNOLOGÍA',
+    title2: 'QUE IMPULSA',
+    highlight: 'TU GEELY',
+    description: 'Amplio stock de repuestos de calidad para cada modelo Geely.',
+    image: '/images/HOME.png',
+    tag: 'CENTRO OFICIAL DE REPUESTOS GEELY – TU SOCIO EN CARRETERA',
+    centered: true,
+    cta2: 'CATÁLOGO COMPLETO'
   }
 ];
 
 // STATS — ahora con iconos reales, sin fotos genéricas de Unsplash
 const statsData = [
-  { icon: Award,   label: 'Calidad Garantizada',     value: '100%',   sub: 'productos certificados'    },
+  { icon: Award,   label: 'Calidad Garantizada',     value: '100%',   sub: 'productos con garantía' },
   { icon: Clock,   label: 'Entrega Rápida',           value: '24h',    sub: 'despacho en Lima'          },
   { icon: Users,   label: 'Clientes Satisfechos',     value: '2,500+', sub: 'en todo el Perú'           },
   { icon: Zap,     label: 'Marcas Disponibles',       value: '80+',    sub: 'fabricantes aliados'       },
@@ -67,7 +70,7 @@ const reasons = [
   {
     icon: Award,
     title: 'Marcas reconocidas',
-    desc: 'Trabajamos solo con fabricantes certificados. Sin genéricos sin respaldo.'
+    desc: 'Trabajamos con marcas reconocidas, piezas alternativas y de línea. Calidad verificada en cada producto.'
   },
   {
     icon: Phone,
@@ -160,7 +163,7 @@ const HomePage = ({
   };
 
   return (
-    <div className="bg-white font-sans">
+    <div className="bg-slate-300 font-sans">
 
       {/* ===================== HERO ===================== */}
       <section className="relative h-screen min-h-[640px] max-h-[900px] overflow-hidden bg-gray-950">
@@ -205,8 +208,8 @@ const HomePage = ({
 
         {/* Contenido hero */}
         <div className={`absolute inset-0 flex items-center transition-all duration-700 ${heroReady ? 'opacity-100' : 'opacity-0'}`}>
-          <div className="max-w-7xl mx-auto px-6 md:px-20 w-full">
-            <div className="max-w-2xl">
+          <div className={`max-w-7xl mx-auto px-6 md:px-20 w-full ${heroSlides[currentSlide].centered ? 'flex justify-center' : ''}`}>
+            <div className={`max-w-2xl ${heroSlides[currentSlide].centered ? 'text-center items-center flex flex-col' : ''}`}>
 
               {/* Tag pill */}
               <div className="inline-flex items-center gap-2 bg-blue-500/15 border border-blue-500/25 px-4 py-1.5 rounded-full mb-6">
@@ -224,37 +227,56 @@ const HomePage = ({
               </h1>
 
               {/* Línea separadora pequeña */}
-              <div className="w-12 h-0.5 bg-blue-500 mb-6" />
+              <div className={`w-12 h-0.5 bg-blue-500 mb-6 ${heroSlides[currentSlide].centered ? 'mx-auto' : ''}`} />
 
               <p className="text-gray-300 text-lg leading-relaxed mb-10 max-w-md">
                 {heroSlides[currentSlide].description}
               </p>
 
-              {/* CTAs */}
-              <div className="flex flex-wrap gap-4">
-                <button
-                  onClick={() => setView('catalog')}
-                  className="group flex items-center gap-3 px-7 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-sm tracking-wide transition-all shadow-2xl shadow-blue-900/40 hover:shadow-blue-500/30 hover:-translate-y-0.5"
-                >
-                  EXPLORAR CATÁLOGO
-                  <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                </button>
-                <a
-                  href="https://wa.me/51974640915"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-3 px-7 py-4 bg-white/8 hover:bg-white/15 border border-white/15 hover:border-white/30 text-white rounded-xl font-bold text-sm tracking-wide transition-all backdrop-blur-sm"
-                >
-                  <Phone size={16} />
-                  CONTÁCTANOS
-                </a>
+              {/* Mini badge ubicación — justo debajo del separador */}
+              <div className={`mb-8 inline-flex items-center gap-2 bg-white/8 border border-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-gray-300 text-xs font-bold tracking-widest uppercase ${heroSlides[currentSlide].centered ? 'justify-center' : ''}`}>
+                <MapPin size={13} className="text-blue-400 flex-shrink-0" />
+                {heroSlides[currentSlide].tag}
               </div>
 
-              {/* Mini badge inferior */}
-              <div className="mt-10 inline-flex items-center gap-2 text-gray-500 text-xs font-bold tracking-widest uppercase">
-                <MapPin size={12} />
-                Jr. Cuarzos 1880, Lima · Envíos a todo el Perú
-              </div>
+              {/* CTAs — slide 2 tiene botones distintos */}
+              {heroSlides[currentSlide].centered ? (
+                <div className="flex flex-wrap gap-4 justify-center">
+                  <button
+                    onClick={() => setView('catalog')}
+                    className="group flex items-center gap-3 px-7 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-sm tracking-wide transition-all shadow-2xl shadow-blue-900/40 hover:-translate-y-0.5"
+                  >
+                    EXPLORAR REPUESTOS
+                    <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  </button>
+                  <button
+                    onClick={() => setView('catalog')}
+                    className="group flex items-center gap-3 px-7 py-4 bg-gray-900/80 hover:bg-gray-800 border border-white/15 hover:border-white/30 text-white rounded-xl font-bold text-sm tracking-wide transition-all backdrop-blur-sm hover:-translate-y-0.5"
+                  >
+                    <Phone size={16} />
+                    CATÁLOGO COMPLETO
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-4">
+                  <button
+                    onClick={() => setView('catalog')}
+                    className="group flex items-center gap-3 px-7 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-sm tracking-wide transition-all shadow-2xl shadow-blue-900/40 hover:shadow-blue-500/30 hover:-translate-y-0.5"
+                  >
+                    EXPLORAR CATÁLOGO
+                    <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  </button>
+                  <a
+                    href="https://wa.me/51974640915"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-3 px-7 py-4 bg-white/8 hover:bg-white/15 border border-white/15 hover:border-white/30 text-white rounded-xl font-bold text-sm tracking-wide transition-all backdrop-blur-sm"
+                  >
+                    <Phone size={16} />
+                    CONTÁCTANOS
+                  </a>
+                </div>
+              )}
 
             </div>
           </div>
@@ -351,7 +373,7 @@ const HomePage = ({
                       <p className="text-gray-400 text-[10px] font-black tracking-widest uppercase mb-1">{p.category || 'Autopartes'}</p>
                       <h4 className="font-black text-gray-900 text-base leading-tight group-hover:text-blue-600 transition-colors">{p.name}</h4>
                       <div className="mt-4 flex items-center justify-between">
-                        <span className="text-xs text-gray-400 font-medium">Equipamiento Original</span>
+                        <span className="text-xs text-gray-400 font-medium">Calidad verificada</span>
                         <div className="w-7 h-7 rounded-full bg-blue-50 group-hover:bg-blue-600 flex items-center justify-center transition-colors">
                           <ChevronRight size={14} className="text-blue-600 group-hover:text-white transition-colors" />
                         </div>
@@ -486,7 +508,7 @@ const HomePage = ({
               </h2>
             </div>
             <p className="text-gray-500 font-medium max-w-xs md:text-right text-sm leading-relaxed">
-              Calidad certificada en cada componente para garantizar tu seguridad.
+              Calidad garantizada en cada componente para tu seguridad y la de tu vehículo.
             </p>
           </div>
         </div>

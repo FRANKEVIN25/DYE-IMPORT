@@ -3,7 +3,7 @@ import { companyInfo } from '../data/initialData';
 
 const AboutPage = () => {
   return (
-    <div className="pt-20">
+    <div className="min-h-screen bg-slate-300 pt-20">
       {/* Hero Section */}
       <div className="relative h-[400px] overflow-hidden bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=1200')] bg-cover bg-center opacity-20" />

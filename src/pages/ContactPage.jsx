@@ -12,7 +12,7 @@ const EMAILJS_PUBLIC_KEY  = 'BrD6Rv90LlUY399IC';
 
 const companyInfo = {
   phone: '+51 974 640 915',
-  email: 'ventas@autopartespro.com',
+  email: 'ventas@dyeautopartes.com',
   address: 'Parque Unión Panamericana 429, La Victoria, Lima',
   whatsapp: '51974640915',
   mapUrl: 'https://www.google.com/maps?q=-12.0764203,-77.0218279&z=17&output=embed',
@@ -106,7 +106,7 @@ const ContactPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-slate-300">
 
       {/* ── HERO ── */}
       <section className="relative bg-gray-950 overflow-hidden">
@@ -355,7 +355,7 @@ const ContactPage = () => {
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="Ubicación DYE IMPORT"
+              title="Ubicación DYE AUTOPARTES"
             />
           </div>
         </div>

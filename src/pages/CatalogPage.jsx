@@ -25,9 +25,9 @@ const ProductCard = ({ product, onClick }) => {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div 
+    <div
       onClick={() => onClick(product)}
-      className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer overflow-hidden border border-gray-100 flex flex-col h-full"
+      className="group bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 cursor-pointer overflow-hidden border border-slate-200 flex flex-col h-full"
     >
       <div className="relative h-56 overflow-hidden bg-gray-50">
         {product.image && !imageError ? (
@@ -54,7 +54,7 @@ const ProductCard = ({ product, onClick }) => {
         )}
         
         {product.featured && (
-          <span className="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+          <span className="absolute top-3 left-3 bg-blue-600 text-white px-2.5 py-1 rounded-full text-[10px] font-black tracking-wider uppercase shadow-md">
             Destacado
           </span>
         )}
@@ -212,8 +212,8 @@ const CatalogPage = ({
   // RENDER PRINCIPAL (SIN LOADING BLOQUEANTE)
   // ============================================
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
-      <div className="bg-gradient-to-r from-gray-900 via-blue-900 to-gray-900 text-white py-20">
+    <div className="min-h-screen bg-slate-300 pt-20">
+      <div className="bg-gray-950 text-white py-20 border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-5xl font-black mb-4 tracking-tighter">Catálogo de Repuestos</h1>
           <p className="text-xl text-blue-200">Busca compatibilidad por marca y modelo</p>
@@ -233,13 +233,13 @@ const CatalogPage = ({
                 setSearchQueryLocal(e.target.value);
                 propSetSearchQuery(e.target.value);
               }}
-              className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none"
+              className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none shadow-sm"
             />
           </div>
-          
+
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="md:hidden flex items-center justify-center gap-2 px-6 py-3 bg-white border-2 border-gray-200 rounded-xl font-bold"
+            className="md:hidden flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold shadow-sm"
           >
             <SlidersHorizontal size={20} /> Filtros
             {activeFiltersCount > 0 && (
@@ -250,7 +250,7 @@ const CatalogPage = ({
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-4 py-3 border-2 border-gray-200 rounded-xl outline-none font-bold bg-white"
+            className="px-4 py-3 border border-slate-200 rounded-xl outline-none font-bold bg-white shadow-sm"
           >
             <option value="featured">Destacados</option>
             <option value="name">Nombre A-Z</option>
@@ -259,8 +259,8 @@ const CatalogPage = ({
 
         <div className="flex gap-8">
           {/* SIDEBAR DE FILTROS */}
-          <aside className={`${showFilters ? 'fixed inset-0 z-50 bg-white p-6 overflow-y-auto' : 'hidden'} md:block md:static md:w-80 flex-shrink-0`}>
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
+          <aside className={`${showFilters ? 'fixed inset-0 z-50 bg-white p-6 overflow-y-auto' : 'hidden'} md:block md:static md:w-72 flex-shrink-0`}>
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sticky top-24">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-black text-gray-900">Filtros</h2>
                 {activeFiltersCount > 0 && (
@@ -287,7 +287,7 @@ const CatalogPage = ({
                   <select
                     value={selectedVehicleBrand}
                     onChange={(e) => setSelectedVehicleBrand(e.target.value)}
-                    className="w-full px-3 py-3 border-2 border-gray-100 rounded-xl font-semibold bg-gray-50 focus:border-blue-400 outline-none"
+                    className="w-full px-3 py-3 border border-slate-200 rounded-xl font-semibold bg-slate-50 focus:border-blue-400 outline-none"
                   >
                     <option value="">Todas las marcas</option>
                     {vehicles.map(v => (
@@ -376,7 +376,7 @@ const CatalogPage = ({
                 ))}
               </div>
             ) : products.length === 0 ? (
-              <div className="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-200">
+              <div className="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-slate-200">
                 <Package size={48} className="text-gray-200 mx-auto mb-4" />
                 <h3 className="text-xl font-black text-gray-400">Inventario vacío</h3>
                 <p className="text-gray-400 mt-2">Aún no hay productos en el catálogo</p>
@@ -395,7 +395,7 @@ const CatalogPage = ({
                 ))}
               </div>
             ) : (
-              <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
+              <div className="text-center py-20 bg-white rounded-2xl border border-slate-200">
                 <Search size={40} className="text-gray-200 mx-auto mb-4" />
                 <p className="font-bold text-gray-400">No hay coincidencias con los filtros</p>
                 <button 

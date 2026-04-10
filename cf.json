@@ -1,0 +1,11 @@
+{
+  "CallerReference": "dye-2026",
+  "Aliases": {"Quantity": 2, "Items": ["dyeautopartes.com", "www.dyeautopartes.com"]},
+  "DefaultRootObject": "index.html",
+  "Origins": {"Quantity": 1, "Items": [{"Id": "s3-dye", "DomainName": "dyeautopartes-web.s3-website-us-east-1.amazonaws.com", "CustomOriginConfig": {"HTTPPort": 80, "HTTPSPort": 443, "OriginProtocolPolicy": "http-only"}}]},
+  "DefaultCacheBehavior": {"TargetOriginId": "s3-dye", "ViewerProtocolPolicy": "redirect-to-https", "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6", "AllowedMethods": {"Quantity": 2, "Items": ["GET", "HEAD"], "CachedMethods": {"Quantity": 2, "Items": ["GET", "HEAD"]}}, "Compress": true},
+  "CustomErrorResponses": {"Quantity": 1, "Items": [{"ErrorCode": 403, "ResponsePagePath": "/index.html", "ResponseCode": "200", "ErrorCachingMinTTL": 0}]},
+  "ViewerCertificate": {"ACMCertificateArn": "arn:aws:acm:us-east-1:724772049291:certificate/f42ef6e6-c26d-47d4-b7b9-20538907c377", "SSLSupportMethod": "sni-only", "MinimumProtocolVersion": "TLSv1.2_2021"},
+  "Enabled": true,
+  "Comment": "DYE Autopartes"
+}
